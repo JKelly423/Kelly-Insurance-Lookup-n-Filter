@@ -39,3 +39,6 @@ Thumbs.db
 # Custom Exclusions #
 #####################
 *.bat
+node_modules
+*.blockmap
+*.pak
