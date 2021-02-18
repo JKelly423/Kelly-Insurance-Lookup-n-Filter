@@ -40,4 +40,5 @@ Thumbs.db
 #####################
 *.bat
 node_modules
+release-builds
 *.pak
