@@ -1,0 +1,16 @@
+directories:
+  output: dist
+  buildResources: build
+appId: com.KellyInsurance.AutoLookupAndFilter
+productName: Auto Lookup & Filter Tool
+copyright: Copyright © 2021 Jack Kelly
+files:
+  - filter:
+      - ./build/icon.ico
+      - ./main.js
+      - ./index.html
+      - ./favicon.ico
+      - renderer.js
+      - ./images/loading.gif
+      - ./images/complete.png
+electronVersion: 1.8.8
