@@ -40,5 +40,4 @@ Thumbs.db
 #####################
 *.bat
 node_modules
-*.blockmap
 *.pak
