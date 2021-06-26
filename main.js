@@ -138,6 +138,7 @@ async function parseCompaies() {
     const csvWriter = createCsvWriter({
         path: "C:\\AutoCompanyIndex\\validResultsCSV\\(" +  dateR  + ") -Results.csv",
         header: [
+            {id: 'mcNumber', title: 'MC-Number'},
             {id: 'company', title: 'Company'},
             {id: 'address', title: 'Address 1'},
             {id: 'city', title: 'City'},
@@ -194,6 +195,7 @@ async function parseCompaies() {
     currentSelector = "body > font > font:nth-child(56) > font > font > span > span > p:nth-child(6) > table:nth-child(3) > tbody > tr:nth-child(" + i.toString() + ")";
     checkSelector = "body > font > font:nth-child(56) > font > font > span > span > p:nth-child(6) > table:nth-child(3) > tbody > tr:nth-child(" + i.toString() + ") > td:nth-child(3)";
 
+    var xPathLine0 = "/html/body/font/font[3]/font/font/span/span/p[4]/table[1]/tbody/tr[" + i.toString() + "]/th";
     var xPathLine1 = "/html/body/font/font[3]/font/font/span/span/p[4]/table[1]/tbody/tr[" + i.toString() + "]/td[2]/text()";
     var xPathLine2 = "/html/body/font/font[3]/font/font/span/span/p[4]/table[1]/tbody/tr[" + i.toString() + "]/td[2]/div/text()";
     var xPathLine3 = "/html/body/font/font[3]/font/font/span/span/p[4]/table[1]/tbody/tr[" + i.toString() + "]/td[2]/div/div/text()";
@@ -207,28 +209,36 @@ async function parseCompaies() {
       return td.outerHTML;
       }));
 
+      // Save MC-Number
+      const elHandle0 = await page.$x(xPathLine0);
+      var xMCnum = await page.evaluate(el => el.textContent, elHandle0[0]);
 
+      // Remove "MC-" from MC-Number so format allows for number-only data to be trasnferred to Auto Company Snapshot tool
+      xMCnum = xMCnum.replace("MC-","");
 
-
+      // Save Company Name
       const elHandle1 = await page.$x(xPathLine1);
       var xCompany = await page.evaluate(el => el.textContent, elHandle1[0]);
 
-
+      // Save Entire Address Line 1
       const elHandle2 = await page.$x(xPathLine2);
       var xAddress = await page.evaluate(el => el.textContent, elHandle2[0]);
 
+      // If they have a DBA name, ignore it and make sure to save address to correct variable
       if(!hasNumber(xAddress) || xAddress.indexOf("D/B/A") > -1){
         const elHandle2 = await page.$x(xPathLine3);
         var xAddress = await page.evaluate(el => el.textContent, elHandle2[0]);
         }
 
+        // Escape characters
         while(xAddress.indexOf(" \'") > 0){
           xAddress = xAddress.replace(" \'", "\'");
         }
-
+      
+        // Save Address Line Two
       const elHandle3 = await page.$x(xPathLine3);
       var xCity = await page.evaluate(el => el.textContent, elHandle3[0]);
-
+      
       if(xCity.indexOf(",") < 0){
         const elHandle3 = await page.$x(xPathLine4);
         var xCity = await page.evaluate(el => el.textContent, elHandle3[0]);
@@ -239,23 +249,26 @@ async function parseCompaies() {
         var xState = xCity.substring( (xCity.indexOf(",") + 2), (xCity.indexOf(",") + 4) );
         xCity = xCity.substring( 0, (xCity.indexOf(',')) );
       }
-
+      
+      console.log("\nXPATH MC: \'" + xMCnum + "\'");
       console.log("XPATH NAME: \'" + xCompany + "\'");
       console.log("XPATH ADDRESS: \'" + xAddress + "\'");
       console.log("XPATH CITY: \'" + xCity + "\'");
       console.log("XPATH STATE: \'" + xState + "\'");
       console.log("XPATH ZIP: \'" + xZip + "\'");
 
-      let obj3 =   {
-    company: xCompany,
-    address: xAddress,
-    city: xCity,
-    state: xState,
-    zip: xZip
-  };
 
-  if (stateList.indexOf(obj3.state) > -1){
-    csvData.push(obj3);
+      let companyInfoObject = {
+        mcNumber: xMCnum,
+        company: xCompany,
+        address: xAddress,
+        city: xCity,
+        state: xState,
+        zip: xZip
+      };
+
+  if (stateList.indexOf(companyInfoObject.state) > -1){
+    csvData.push(companyInfoObject);
   }
 
         var isStateGood = false;
