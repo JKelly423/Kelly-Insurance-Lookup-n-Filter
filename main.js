@@ -92,6 +92,7 @@ function hasNumber(myString) {
 }
 
   var csvData = [];
+  var mcNumListData = [];
 
 async function parseCompaies() {
     console.log("\nBegining of parseCompaies()");
@@ -269,6 +270,7 @@ async function parseCompaies() {
 
   if (stateList.indexOf(companyInfoObject.state) > -1){
     csvData.push(companyInfoObject);
+    mcNumListData.push(companyInfoObject.mcNumber);
   }
 
         var isStateGood = false;
@@ -317,6 +319,13 @@ async function parseCompaies() {
     }
 
   }
+  // Add commas to deliminate the MC numbers, and save them all to one string called 'mcNumListBody'. This will be our HTML body.
+  var mcNumListBody = '';
+  mcNumListData.forEach(element => {
+    element = element.concat(",");
+    mcNumListBody = mcNumListBody.concat(element);
+    });
+
   var resultsHead = `<html>
 
   <head>
@@ -450,17 +459,35 @@ async function parseCompaies() {
   `;
   var resultsFoot = `</table></body></html>`;
 
+  // get date information
+  while (dateReleased[0].indexOf("/") > -1){
+    dateReleased[0] = dateReleased[0].replace("/","-")
+  }
+  dateOf = dateReleased[0];
+
+
+      // create MC list HTML results code
+      var mcHTML = '<html><head><title>MC-Number List</title></head><body>';
+      mcHTML = mcHTML.concat(mcNumListBody);
+      mcHTML = mcHTML.concat('</body></html>');
+
+      // Write MC List Data to file system
+      let fileNameMC = ("C:\\AutoCompanyIndex\\validResultsHTML\\(" +  dateReleased[0]  + ") -mcNumberList.html");
+      fs.ensureFileSync(fileNameMC);
+      fs.writeFile(fileNameMC, mcHTML, 'utf8', (err) => {
+          if (err) throw err;
+          console.log("The MC-Number List Results file has been saved!");
+      });
+
+      // create main table HTMl results code
     var html = resultsHead.concat(resultsBody);
     html = html.concat(resultsFoot);
-    while (dateReleased[0].indexOf("/") > -1){
-      dateReleased[0] = dateReleased[0].replace("/","-")
-    }
-    dateOf = dateReleased[0];
+
     const fileName = ("C:\\AutoCompanyIndex\\validResultsHTML\\(" +  dateReleased[0]  + ") -Results.html");
       fs.ensureFileSync(fileName);
       fs.writeFile(fileName, html, 'utf8', (err) => {
           if (err) throw err;
-          console.log("The HTML file has been saved!");
+          console.log("The HTML Results file has been saved!");
       });
       console.log("Saving CSV file...");
       csvWriter.writeRecords(csvData)       // returns a promise
@@ -472,10 +499,17 @@ async function parseCompaies() {
       ipcMain.on('show:results', function(e) {
         printResults();
       });
+      ipcMain.on('results:mcList', function(e) {
+        printResultsMC();
+      });
 }
 
 function printResults() {
     shell.openExternal("C:\\AutoCompanyIndex\\validResultsHTML\\(" +  dateOf + ") -Results.html");
+}
+
+function printResultsMC() {
+  shell.openExternal("C:\\AutoCompanyIndex\\validResultsHTML\\(" +  dateOf + ") -mcNumberList.html");
 }
 
 function isNumber(target){
@@ -507,10 +541,16 @@ const mainMenuTemplate = [
     {
         label: 'File',
         submenu: [{
-                label: 'Print Results',
+                label: 'View Results',
                 click() {
                     printResults();
                 }
+            },
+            {
+              label: 'View MC Numbers',
+              click() {
+                printResultsMC();
+            }
             },
             {
                 label: 'Quit',

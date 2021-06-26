@@ -24,6 +24,15 @@
       margin: 4px 2px;
       cursor: pointer;
     }
+    .mcButton{
+      background-color: #D0CDCD;
+      border: 2px solid black;
+      color: black;
+      padding: 16px 32px;
+      text-decoration: none;
+      margin: 4px 2px;
+      cursor: pointer;
+    }
     body {
       background-color: #1cfcaf;
       border: none;
@@ -58,11 +67,15 @@
     }
     ipcRenderer.on("complete:success", function(e, savedResults) {
       var savedSection = document.querySelector("#saved");
-      savedSection.innerHTML ='<image src="./images/complete.png"><h3>Lookup Complete!</h3><h4>' +  savedResults + ' Results Saved!</h4><button onclick="showResults()">View Results</button>';
+      savedSection.innerHTML ='<image src="./images/complete.png"><h3>Lookup Complete!</h3><h4>' +  savedResults + ' Results Saved!</h4><button onclick="showResults()">View Results in Table</button><br><button class="mcButton" onclick="showResultsMC()">View MC-Number List</button>';
     });
 
     function showResults() {
       ipcRenderer.send("show:results");
+    }
+    
+        function showResultsMC() {
+      ipcRenderer.send("results:mcList");
     }
   </script>
 </body>

@@ -1,13 +1,13 @@
 {
   "name": "autolookupandfilter",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "A web app to automate the scraping of Insurance Carrier information",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "winpack": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=favicon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Auto Company Lookup & Filter Tool\""
+    "winpack": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=/build/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Auto Company Lookup & Filter Tool\""
   },
   "build": {
     "appId": "com.KellyInsurance.AutoLookupAndFilter",
